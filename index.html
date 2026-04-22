@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Evolvr – Your LLM, Continuously Evolving</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0A0A0A;
+      --bg2: #111111;
+      --bg3: #0F0F0F;
+      --border: #1E1E1E;
+      --accent: #7B4FFF;
+      --accent2: #5B3FEF;
+      --text: #FFFFFF;
+      --text-dim: #B0B0B0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.025em;
+      line-height: 1.15;
+    }
+
+    h1 { font-size: clamp(40px, 6vw, 76px); color: var(--text); }
+    h2 { font-size: clamp(28px, 4vw, 52px); color: var(--text); }
+
+    /* ── BUTTONS ── */
+    .btn {
+      font-family: 'Inter', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 14px 28px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      box-shadow: 0 8px 24px rgba(123,79,255,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(123,79,255,0.45); }
+    .btn-outline {
+      background: transparent;
+      color: #fff;
+      border: 1.5px solid rgba(255,255,255,0.25);
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: rgba(123,79,255,0.05); transform: translateY(-2px); }
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 22px 60px;
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(123,79,255,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .logo {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: var(--text);
+    }
+    .logo .v { color: var(--accent); }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a { color: var(--text); text-decoration: none; font-weight: 600; font-size: 14px; transition: color 0.2s; }
+    .nav-links a:hover { color: var(--accent); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 130px 60px 100px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; top: -30%; right: -15%;
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(123,79,255,0.12) 0%, transparent 70%);
+      filter: blur(40px); pointer-events: none;
+    }
+    .hero::after {
+      content: '';
+      position: absolute; bottom: -20%; left: -10%;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(91,63,239,0.09) 0%, transparent 70%);
+      filter: blur(40px); pointer-events: none;
+    }
+    .hero-content { position: relative; z-index: 2; }
+    .hero h1 { margin-bottom: 24px; animation: fadeUp 0.7s ease both; }
+    .hero .subtext {
+      font-size: 18px; color: var(--text-dim);
+      max-width: 680px; margin: 0 auto 44px;
+      line-height: 1.75; animation: fadeUp 0.7s 0.1s ease both;
+    }
+    .hero-ctas { display: flex; gap: 14px; justify-content: center; margin-bottom: 40px; animation: fadeUp 0.7s 0.2s ease both; flex-wrap: wrap; }
+    .social-proof { font-size: 13px; color: var(--text-dim); margin-bottom: 72px; animation: fadeUp 0.7s 0.3s ease both; }
+
+    .hero-visual {
+      background: var(--bg2);
+      border: 1px solid rgba(123,79,255,0.2);
+      border-radius: 8px;
+      padding: 48px;
+      max-width: 860px;
+      margin: 0 auto;
+      box-shadow: 0 20px 60px rgba(123,79,255,0.08);
+      animation: fadeUp 0.7s 0.4s ease both;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .hero-visual:hover { border-color: rgba(123,79,255,0.4); box-shadow: 0 30px 80px rgba(123,79,255,0.14); }
+
+    .ba-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 32px; align-items: center; }
+    .metric-card { background: var(--bg3); padding: 24px; border-radius: 6px; border: 1px solid var(--border); text-align: left; }
+    .metric-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
+    .metric-value { font-size: 36px; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
+    .metric-desc { font-size: 13px; color: var(--text-dim); }
+    .ba-arrow { color: var(--accent); font-size: 22px; font-weight: 800; }
+
+    /* ── LOGOS ── */
+    .logos-bar {
+      padding: 52px 60px;
+      text-align: center;
+      border-top: 1px solid rgba(123,79,255,0.08);
+      border-bottom: 1px solid rgba(123,79,255,0.08);
+    }
+    .logos-title { font-size: 12px; color: var(--text-dim); letter-spacing: 2.5px; text-transform: uppercase; font-weight: 600; margin-bottom: 36px; }
+    .logos-grid { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; align-items: center; }
+    .logo-item {
+      width: 130px; height: 44px;
+      background: rgba(123,79,255,0.04);
+      border: 1px solid rgba(123,79,255,0.12);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; color: var(--text-dim); font-weight: 600;
+      transition: all 0.25s;
+    }
+    .logo-item:hover { border-color: rgba(123,79,255,0.3); color: var(--text); }
+
+    /* ── HOW IT WORKS ── */
+    .how {
+      padding: 110px 60px;
+      text-align: center;
+    }
+    .how h2 { margin-bottom: 72px; }
+    .steps {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      max-width: 1100px;
+      margin: 0 auto;
+      gap: 12px;
+    }
+    .steps::before {
+      content: '';
+      position: absolute; top: 39px; left: 8%; right: 8%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(123,79,255,0.4), transparent);
+    }
+    .step { flex: 1; position: relative; z-index: 1; text-align: center; transition: transform 0.25s; }
+    .step:hover { transform: translateY(-4px); }
+    .step-icon {
+      width: 78px; height: 78px;
+      background: rgba(123,79,255,0.1);
+      border: 2px solid rgba(123,79,255,0.35);
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; font-weight: 800; color: var(--accent);
+      transition: all 0.25s;
+    }
+    .step:hover .step-icon { border-color: var(--accent); box-shadow: 0 0 18px rgba(123,79,255,0.2); }
+    .step h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
+    .step p { font-size: 13px; color: var(--text-dim); line-height: 1.6; padding: 0 8px; }
+
+    /* ── FEATURES ── */
+    .features { padding: 110px 60px; }
+    .features h2 { text-align: center; margin-bottom: 72px; }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 28px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .feature-card {
+      background: var(--bg2);
+      border: 1px solid rgba(123,79,255,0.12);
+      border-radius: 8px;
+      padding: 40px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s ease;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(123,79,255,0.5), transparent);
+    }
+    .feature-card:hover { border-color: rgba(123,79,255,0.35); transform: translateY(-6px); box-shadow: 0 20px 50px rgba(123,79,255,0.12); }
+    .feature-icon { font-size: 28px; margin-bottom: 18px; }
+    .feature-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+    .feature-card p { font-size: 14px; color: var(--text-dim); line-height: 1.75; }
+
+    /* ── METRICS ── */
+    .metrics {
+      padding: 100px 60px;
+      background: var(--bg2);
+      border-top: 1px solid rgba(123,79,255,0.08);
+      border-bottom: 1px solid rgba(123,79,255,0.08);
+    }
+    .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; max-width: 900px; margin: 0 auto; text-align: center; }
+    .metric-stat { padding: 20px; border-left: 1px solid rgba(123,79,255,0.15); }
+    .metric-stat:first-child { border-left: none; }
+    .metric-stat .num { font-size: 52px; font-weight: 800; color: var(--accent); margin-bottom: 10px; font-family: 'Plus Jakarta Sans', sans-serif; }
+    .metric-stat .label { font-size: 15px; color: var(--text-dim); }
+
+    /* ── PRICING ── */
+    .pricing { padding: 110px 60px; }
+    .pricing h2 { text-align: center; margin-bottom: 72px; }
+    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; max-width: 960px; margin: 0 auto; }
+    .pricing-card {
+      background: var(--bg2);
+      border: 1px solid rgba(123,79,255,0.12);
+      border-radius: 8px;
+      padding: 40px;
+      text-align: center;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    .pricing-card.highlighted {
+      border-color: rgba(123,79,255,0.5);
+      box-shadow: 0 0 40px rgba(123,79,255,0.15);
+    }
+    .highlighted-badge {
+      position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff; font-size: 11px; font-weight: 700;
+      padding: 4px 14px; border-radius: 20px; letter-spacing: 0.5px;
+      white-space: nowrap;
+    }
+    .pricing-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 20px; }
+    .price-tag { font-size: 20px; font-weight: 700; color: var(--text-dim); margin-bottom: 6px; }
+    .price-period { font-size: 13px; color: var(--text-dim); margin-bottom: 28px; }
+    .pricing-features { list-style: none; margin-bottom: 28px; text-align: left; }
+    .pricing-features li { font-size: 13px; padding: 10px 0; border-bottom: 1px solid var(--border); color: var(--text-dim); }
+    .pricing-features li:last-child { border-bottom: none; }
+
+    /* ── CTA BANNER ── */
+    .cta-banner {
+      padding: 96px 60px;
+      background: linear-gradient(135deg, rgba(123,79,255,0.09), rgba(91,63,239,0.04));
+      border-top: 1px solid rgba(123,79,255,0.18);
+      border-bottom: 1px solid rgba(123,79,255,0.18);
+      text-align: center;
+    }
+    .cta-banner h2 { margin-bottom: 36px; }
+
+    /* ── FOOTER ── */
+    footer { padding: 60px; background: var(--bg); border-top: 1px solid var(--border); }
+    .footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 60px; margin-bottom: 48px; }
+    .footer-brand .logo { font-size: 20px; display: block; margin-bottom: 8px; }
+    .footer-brand p { font-size: 14px; color: var(--text-dim); }
+    .footer-col h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; color: var(--text); }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 10px; }
+    .footer-col ul a { color: var(--text-dim); text-decoration: none; font-size: 14px; transition: color 0.2s; }
+    .footer-col ul a:hover { color: var(--accent); }
+    .footer-bottom { border-top: 1px solid var(--border); padding-top: 32px; text-align: center; font-size: 13px; color: var(--text-dim); max-width: 1100px; margin: 0 auto; }
+
+    /* ── WAITLIST MODAL ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.72); backdrop-filter: blur(6px);
+      z-index: 9999; align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: var(--bg2);
+      border: 1px solid rgba(123,79,255,0.3);
+      border-radius: 12px;
+      padding: 56px;
+      max-width: 460px; width: 90%;
+      text-align: center;
+      position: relative;
+      animation: popUp 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
+    }
+    @keyframes popUp { from { opacity:0; transform:translateY(32px); } to { opacity:1; transform:translateY(0); } }
+    .modal-close {
+      position: absolute; top: 18px; right: 18px;
+      background: none; border: none; color: var(--text-dim);
+      font-size: 22px; cursor: pointer; transition: color 0.2s;
+      width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+    }
+    .modal-close:hover { color: var(--accent); }
+    .modal-box h2 { font-size: 28px; margin-bottom: 12px; }
+    .modal-box .modal-sub { font-size: 15px; color: var(--text-dim); margin-bottom: 28px; line-height: 1.6; }
+    .modal-form { display: flex; flex-direction: column; gap: 14px; }
+    .modal-form input {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(123,79,255,0.25);
+      border-radius: 6px; padding: 13px 16px;
+      color: #fff; font-size: 14px; font-family: 'Inter', sans-serif;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .modal-form input::placeholder { color: rgba(255,255,255,0.35); }
+    .modal-form input:focus { outline: none; border-color: rgba(123,79,255,0.6); background: rgba(255,255,255,0.07); }
+    .modal-form .btn { width: 100%; font-size: 15px; padding: 15px; }
+    .modal-note { margin-top: 16px; font-size: 12px; color: rgba(255,255,255,0.3); }
+
+    /* Success state */
+    .success-state { display: none; }
+    .success-state .check { font-size: 48px; margin-bottom: 16px; }
+    .success-state h3 { font-size: 22px; margin-bottom: 8px; }
+    .success-state p { font-size: 14px; color: var(--text-dim); }
+
+    /* Error msg */
+    .error-msg { font-size: 13px; color: #FF6B6B; margin-top: -6px; display: none; }
+
+    @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 18px 28px; }
+      .nav-links { display: none; }
+      .hero { padding: 80px 28px 60px; }
+      .how, .features, .pricing, .metrics, .cta-banner, .logos-bar, footer { padding-left: 28px; padding-right: 28px; }
+      .steps { flex-wrap: wrap; gap: 32px; }
+      .steps::before { display: none; }
+      .step { flex: 0 1 calc(50% - 16px); }
+      .pricing-grid, .metrics-grid { grid-template-columns: 1fr; }
+      .footer-inner { grid-template-columns: 1fr; gap: 40px; }
+      .ba-grid { grid-template-columns: 1fr; }
+      .ba-arrow { transform: rotate(90deg); text-align: center; }
+    }
+    @media (max-width: 540px) {
+      .step { flex: 1 1 100%; }
+      .features-grid { grid-template-columns: 1fr; }
+      .hero-visual { padding: 24px; }
+      .modal-box { padding: 36px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">EVO<span class="v">LV</span>R</div>
+  <ul class="nav-links">
+    <li><a href="#product">Product</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#docs">Docs</a></li>
+    <li><a href="#blog">Blog</a></li>
+  </ul>
+  <button class="btn btn-primary" onclick="openModal()">Join Waitlist</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-content">
+    <h1>Your LLM,<br>Continuously Evolving.</h1>
+    <p class="subtext">Evolvr diagnoses your model's weak spots, generates targeted synthetic training data, and fine-tunes it automatically. No infra. No guesswork.</p>
+    <div class="hero-ctas">
+      <button class="btn btn-primary" onclick="openModal()">Join Waitlist →</button>
+      <a class="btn btn-outline" href="#how">See How It Works</a>
+    </div>
+    <p class="social-proof">Trusted by 200+ AI teams worldwide</p>
+    <div class="hero-visual">
+      <div class="ba-grid">
+        <div class="metric-card">
+          <div class="metric-label">Criminal Law Accuracy</div>
+          <div class="metric-value">43%</div>
+          <div class="metric-desc">Before Evolvr</div>
+        </div>
+        <div class="ba-arrow">→</div>
+        <div class="metric-card">
+          <div class="metric-label">Criminal Law Accuracy</div>
+          <div class="metric-value" style="color:#00D084;">89%</div>
+          <div class="metric-desc">After Evolvr ↑ +107%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGOS -->
+<section class="logos-bar">
+  <p class="logos-title">Trusted by teams at —</p>
+  <div class="logos-grid">
+    <div class="logo-item">OpenAI</div>
+    <div class="logo-item">Anthropic</div>
+    <div class="logo-item">Scale AI</div>
+    <div class="logo-item">Databricks</div>
+    <div class="logo-item">Together AI</div>
+    <div class="logo-item">Hugging Face</div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <h2>The Evolvr Loop</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-icon">①</div>
+      <h3>EVAL</h3>
+      <p>Run comprehensive evaluation across 10,000+ test scenarios automatically</p>
+    </div>
+    <div class="step">
+      <div class="step-icon">②</div>
+      <h3>DIAGNOSE</h3>
+      <p>Pinpoint exact weak spots in your model's performance</p>
+    </div>
+    <div class="step">
+      <div class="step-icon">③</div>
+      <h3>SYNTHESIZE</h3>
+      <p>Generate targeted fine-tuning data for only those gaps</p>
+    </div>
+    <div class="step">
+      <div class="step-icon">④</div>
+      <h3>FINE-TUNE</h3>
+      <p>LoRA fine-tuning deployed in 2 hours. No DevOps.</p>
+    </div>
+    <div class="step">
+      <div class="step-icon">⑤</div>
+      <h3>VERIFY</h3>
+      <p>Before/after benchmarks prove the improvement delta</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features" id="product">
+  <h2>Built for Production</h2>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🔍</div>
+      <h3>Eval Engine</h3>
+      <p>Pinpoint exactly where your model fails across 10,000+ test scenarios automatically. Get a failure heatmap per topic.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚙️</div>
+      <h3>Synthetic Data</h3>
+      <p>Generate targeted fine-tuning data for only the weak spots. No noise, no bloat. Anti-hallucination filtered.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔥</div>
+      <h3>Auto Fine-Tune</h3>
+      <p>LoRA fine-tuning in 2 hours. No GPU setup, no DevOps required. Just click and it runs on serverless infra.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">✅</div>
+      <h3>Verify & Compare</h3>
+      <p>Before/after benchmarks prove improvement. Show your team the exact accuracy delta with regression testing.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🇮🇳</div>
+      <h3>Indic Language Support</h3>
+      <p>Hindi, Hinglish, Tamil — train models that actually understand India. Zero competition globally on this.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🔄</div>
+      <h3>Continuous Loop</h3>
+      <p>Deploy, monitor, improve. Your model evolves with every production cycle. Never goes stale again.</p>
+    </div>
+  </div>
+</section>
+
+<!-- METRICS -->
+<section class="metrics">
+  <div class="metrics-grid">
+    <div class="metric-stat">
+      <div class="num">13.7%</div>
+      <div class="label">avg accuracy improvement per loop</div>
+    </div>
+    <div class="metric-stat">
+      <div class="num">2h</div>
+      <div class="label">average fine-tune turnaround time</div>
+    </div>
+    <div class="metric-stat">
+      <div class="num">4x</div>
+      <div class="label">cheaper than manual data labeling</div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <h2>Simple, Transparent Pricing</h2>
+  <div class="pricing-grid">
+    <div class="pricing-card">
+      <h3>Dev</h3>
+      <div class="price-tag">Coming Soon</div>
+      <div class="price-period">Free forever</div>
+      <ul class="pricing-features">
+        <li>✓ 5 evals / month</li>
+        <li>✓ Community support</li>
+        <li>✓ Basic analytics</li>
+        <li>✗ Synthetic data gen</li>
+        <li>✗ Auto fine-tune</li>
+      </ul>
+      <button class="btn btn-outline" style="width:100%" onclick="openModal()">Join Waitlist</button>
+    </div>
+    <div class="pricing-card highlighted">
+      <div class="highlighted-badge">Most Popular</div>
+      <h3>Startup</h3>
+      <div class="price-tag">Coming Soon</div>
+      <div class="price-period">Q2 2026</div>
+      <ul class="pricing-features">
+        <li>✓ Unlimited evals</li>
+        <li>✓ Priority support</li>
+        <li>✓ Synthetic data gen</li>
+        <li>✓ Auto fine-tune</li>
+        <li>✓ Before/after benchmarks</li>
+      </ul>
+      <button class="btn btn-primary" style="width:100%" onclick="openModal()">Join Waitlist</button>
+    </div>
+    <div class="pricing-card">
+      <h3>Scale</h3>
+      <div class="price-tag">Coming Soon</div>
+      <div class="price-period">Q3 2026</div>
+      <ul class="pricing-features">
+        <li>✓ Everything in Startup</li>
+        <li>✓ Dedicated support</li>
+        <li>✓ Custom eval suites</li>
+        <li>✓ API access</li>
+        <li>✓ SLA guarantee</li>
+      </ul>
+      <button class="btn btn-outline" style="width:100%" onclick="openModal()">Contact Sales</button>
+    </div>
+  </div>
+</section>
+
+<!-- CTA BANNER -->
+<section class="cta-banner">
+  <h2>Start evolving your LLM today.</h2>
+  <button class="btn btn-primary" onclick="openModal()">Get Early Access →</button>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="logo">EVO<span class="v">LV</span>R</span>
+      <p>The LLM improvement engine.</p>
+    </div>
+    <div class="footer-col">
+      <h4>Product</h4>
+      <ul>
+        <li><a href="#product">Features</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#docs">Documentation</a></li>
+        <li><a href="#status">Status</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <ul>
+        <li><a href="#about">About</a></li>
+        <li><a href="#blog">Blog</a></li>
+        <li><a href="#careers">Careers</a></li>
+        <li><a href="#legal">Legal</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2026 Evolvr Inc. All rights reserved.</p>
+  </div>
+</footer>
+
+<!-- WAITLIST MODAL -->
+<div class="modal-overlay" id="modal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+
+    <!-- Form state -->
+    <div id="formState">
+      <h2>Join the Waitlist</h2>
+      <p class="modal-sub">Be among the first to access Evolvr and transform your LLM development process.</p>
+      <div class="modal-form">
+        <input type="email" id="emailInput" placeholder="your@email.com" required>
+        <input type="text" id="companyInput" placeholder="Company name (optional)">
+        <p class="error-msg" id="errorMsg">Something went wrong. Please try again.</p>
+        <button class="btn btn-primary" id="submitBtn" onclick="submitWaitlist()">Get Early Access</button>
+      </div>
+      <p class="modal-note">We'll never spam you. Unsubscribe anytime.</p>
+    </div>
+
+    <!-- Success state -->
+    <div class="success-state" id="successState">
+      <div class="check">🎉</div>
+      <h3>You're on the list!</h3>
+      <p>We'll reach out soon with early access details. Watch your inbox.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ── Supabase Init ──
+  const { createClient } = supabase;
+  const sb = createClient(
+    'https://pgotfsopsozhxhtflgon.supabase.co',
+    'sb_publishable_YKyyQR-q1b5r-yiARHMK9Q_8sECFY1C'
+  );
+
+  // ── Modal ──
+  function openModal() {
+    document.getElementById('modal').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeModal() {
+    document.getElementById('modal').classList.remove('open');
+    document.body.style.overflow = '';
+    // reset form after close
+    setTimeout(() => {
+      document.getElementById('formState').style.display = 'block';
+      document.getElementById('successState').style.display = 'none';
+      document.getElementById('emailInput').value = '';
+      document.getElementById('companyInput').value = '';
+      document.getElementById('errorMsg').style.display = 'none';
+      document.getElementById('submitBtn').textContent = 'Get Early Access';
+      document.getElementById('submitBtn').disabled = false;
+    }, 400);
+  }
+
+  // Close on overlay click
+  document.getElementById('modal').addEventListener('click', function(e) {
+    if (e.target === this) closeModal();
+  });
+
+  // Close on ESC
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+  // ── Submit ──
+  async function submitWaitlist() {
+    const email = document.getElementById('emailInput').value.trim();
+    const company = document.getElementById('companyInput').value.trim();
+    const btn = document.getElementById('submitBtn');
+    const errMsg = document.getElementById('errorMsg');
+
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errMsg.textContent = 'Please enter a valid email address.';
+      errMsg.style.display = 'block';
+      return;
+    }
+
+    btn.textContent = 'Saving...';
+    btn.disabled = true;
+    errMsg.style.display = 'none';
+
+    const { error } = await sb
+      .from('waitlist')
+      .insert([{ email, company: company || null }]);
+
+    if (error) {
+      if (error.code === '23505') {
+        // duplicate — still show success
+        showSuccess();
+      } else {
+        errMsg.textContent = 'Something went wrong. Please try again.';
+        errMsg.style.display = 'block';
+        btn.textContent = 'Get Early Access';
+        btn.disabled = false;
+      }
+    } else {
+      showSuccess();
+    }
+  }
+
+  function showSuccess() {
+    document.getElementById('formState').style.display = 'none';
+    document.getElementById('successState').style.display = 'block';
+  }
+</script>
+</body>
+</html>
