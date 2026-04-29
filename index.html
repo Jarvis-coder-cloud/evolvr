@@ -59,11 +59,17 @@
             <span>Failure maps</span>
             <span>Deployable datasets</span>
           </div>
+          <div class="proof-strip">
+            <div class="proof-item"><strong>10k+</strong><span>domain scenarios per run</span></div>
+            <div class="proof-item"><strong>2h</strong><span>diagnosis to artifact</span></div>
+            <div class="proof-item"><strong>Holdout verified</strong><span>before release</span></div>
+          </div>
         </div>
 
         <div class="dashboard" aria-label="Evolvr dashboard preview">
           <div class="dashboard-top"><span>Eval run: legal-rag-v3</span><span class="status-dot"></span></div>
           <div class="dashboard-body">
+            <div class="dashboard-tabs"><span class="active">Eval</span><span>Failures</span><span>Dataset</span><span>Report</span></div>
             <div class="score-row">
               <div class="score-card"><div class="score-label">Baseline</div><div class="score-value">43%</div><div class="score-desc">Criminal law accuracy</div></div>
               <div class="arrow">-></div>
@@ -75,6 +81,12 @@
               <div><strong>checks</strong>: leakage + hallucination filters passed</div>
               <div><strong>ready</strong>: dataset + eval report</div>
             </div>
+            <div class="dash-table">
+              <div class="dash-row"><span>Failure cluster</span><span>Impact</span><span>Action</span></div>
+              <div class="dash-row"><span>Jurisdiction ambiguity</span><span class="warn">High</span><span>Generate</span></div>
+              <div class="dash-row"><span>Unsupported citation</span><span class="warn">Medium</span><span>Review</span></div>
+              <div class="dash-row"><span>Hindi-English query</span><span class="good">Fixed</span><span>Verified</span></div>
+            </div>
           </div>
         </div>
       </div>
@@ -83,8 +95,8 @@
     <section class="section">
       <div class="container">
         <div class="section-head">
-          <div><div class="eyebrow">Built for technical teams</div><h2>Built for serious AI teams.</h2></div>
-          <p>For regulated workflows, enterprise copilots, support automation, and domain agents.</p>
+          <div><div class="eyebrow">Who it is for</div><h2>When model quality is now a product risk.</h2></div>
+          <p>For teams shipping AI into workflows where wrong, vague, or outdated answers are expensive.</p>
         </div>
         <div class="logos">
           <div class="logo-cell">LLM Apps</div><div class="logo-cell">AI Agents</div><div class="logo-cell">RAG Systems</div><div class="logo-cell">Fintech</div><div class="logo-cell">Legal AI</div><div class="logo-cell">Healthcare AI</div>
@@ -95,22 +107,46 @@
     <section class="section">
       <div class="container">
         <div class="section-head">
-          <div><div class="eyebrow">Product</div><h2>Everything needed to improve model quality.</h2></div>
-          <p>Clear enough for leadership. Detailed enough for ML teams.</p>
+          <div><div class="eyebrow">Loop</div><h2>Not another dashboard. A quality improvement system.</h2></div>
+          <p>Each run creates something your team can use in the next release.</p>
         </div>
-        <div class="grid-3">
-          <div class="card"><div class="kicker">Visibility</div><h3>Failure heatmaps</h3><p>Know exactly where quality drops.</p></div>
-          <div class="card"><div class="kicker">Data</div><h3>Targeted synthetic data</h3><p>Add focused examples, not noisy volume.</p></div>
-          <div class="card"><div class="kicker">Validation</div><h3>Before and after reports</h3><p>Show the lift with one source of truth.</p></div>
+        <div class="pipeline">
+          <div class="pipeline-card"><div class="step-number">01</div><h3>Evaluate</h3><p>Run domain scenarios against your current model behavior.</p></div>
+          <div class="pipeline-card"><div class="step-number">02</div><h3>Diagnose</h3><p>Cluster failures by task, language, source, and reasoning pattern.</p></div>
+          <div class="pipeline-card"><div class="step-number">03</div><h3>Generate</h3><p>Create targeted data for gaps that can move the metric.</p></div>
+          <div class="pipeline-card"><div class="step-number">04</div><h3>Verify</h3><p>Compare the lift on holdouts before anything ships.</p></div>
         </div>
       </div>
     </section>
 
     <section class="section">
-      <div class="container metrics-band">
-        <div class="metric"><strong>+107%</strong><span>lift in a first-loop legal benchmark</span></div>
-        <div class="metric"><strong>2h</strong><span>from diagnosis to deployable artifact</span></div>
-        <div class="metric"><strong>10k+</strong><span>scenario tests per domain run</span></div>
+      <div class="container case-band">
+        <div class="case-feature">
+          <div class="eyebrow">Design partner focus</div>
+          <h2>Built around real failure modes.</h2>
+          <p>Most eval tools tell you the model is worse. Evolvr tells you where, why, and what artifact to ship next.</p>
+          <div class="hero-actions"><a class="btn btn-primary" href="use-cases.html">Explore Use Cases</a><a class="btn" href="docs.html">Technical Overview</a></div>
+        </div>
+        <div class="case-list">
+          <div class="mini-card"><strong>RAG systems</strong><span>Separate retrieval misses from generation failures.</span></div>
+          <div class="mini-card"><strong>AI agents</strong><span>Find weak decision steps before workflows escalate.</span></div>
+          <div class="mini-card"><strong>Legal and fintech</strong><span>Catch policy, citation, and compliance-sensitive gaps.</span></div>
+          <div class="mini-card"><strong>Indic models</strong><span>Test Hindi, Hinglish, and multilingual edge cases.</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div><div class="eyebrow">Artifacts</div><h2>Outputs your team can actually ship.</h2></div>
+          <p>Every improvement loop ends with portable evidence and release-ready files.</p>
+        </div>
+        <div class="grid-3">
+          <div class="card"><div class="kicker">Dataset</div><h3>Fine-tune ready examples</h3><p>Targeted examples mapped to the failure cluster they fix.</p></div>
+          <div class="card"><div class="kicker">Report</div><h3>Before and after evidence</h3><p>A clear record for product, ML, customers, and investors.</p></div>
+          <div class="card"><div class="kicker">Integration</div><h3>Fits your stack</h3><p>Use outputs with RAG updates, prompts, fine-tunes, or review queues.</p></div>
+        </div>
       </div>
     </section>
 
