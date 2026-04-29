@@ -1,0 +1,9 @@
+{
+  "name": "evolvr-website",
+  "version": "1.0.0",
+  "description": "Evolvr - Your LLM, Continuously Evolving",
+  "private": true,
+  "scripts": {
+    "dev": "echo 'Static site - open index.html'"
+  }
+}
