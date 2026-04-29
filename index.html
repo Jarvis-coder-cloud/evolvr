@@ -366,6 +366,13 @@
       .modal-box { padding: 36px 24px; }
     }
   </style>
+  <script type="importmap">
+  {
+      "imports": {
+          "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+      }
+  }
+  </script>
 </head>
 <body>
 
@@ -383,7 +390,8 @@
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-content">
+  <canvas id="hero-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto;"></canvas>
+  <div class="hero-content" style="position: relative; z-index: 2;">
     <h1>Your LLM,<br>Continuously Evolving.</h1>
     <p class="subtext">Evolvr diagnoses your model's weak spots, generates targeted synthetic training data, and fine-tunes it automatically. No infra. No guesswork.</p>
     <div class="hero-ctas">
@@ -696,6 +704,111 @@
     document.getElementById('formState').style.display = 'none';
     document.getElementById('successState').style.display = 'block';
   }
+</script>
+
+<!-- HERO PARTICLE ANIMATION -->
+<script type="module">
+  import * as THREE from 'three';
+
+  const canvas = document.getElementById('hero-canvas');
+  const heroSection = document.querySelector('.hero');
+  const scene = new THREE.Scene();
+  
+  const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+  camera.position.z = 100;
+  
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+  renderer.setClearColor(0x000000, 0);
+  renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+  renderer.setPixelRatio(window.devicePixelRatio);
+
+  // Particle system
+  const particlesGeometry = new THREE.BufferGeometry();
+  const particleCount = 1500;
+  const positionArray = new Float32Array(particleCount * 3);
+  
+  for (let i = 0; i < particleCount * 3; i += 3) {
+    positionArray[i] = (Math.random() - 0.5) * 400;
+    positionArray[i + 1] = (Math.random() - 0.5) * 400;
+    positionArray[i + 2] = (Math.random() - 0.5) * 300;
+  }
+  
+  particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positionArray, 3));
+  
+  const particlesMaterial = new THREE.PointsMaterial({
+    size: 2,
+    color: 0x7B4FFF,
+    sizeAttenuation: true,
+    transparent: true,
+    opacity: 0.6
+  });
+  
+  const particles = new THREE.Points(particlesGeometry, particlesMaterial);
+  scene.add(particles);
+
+  // Mouse tracking
+  let mouse = { x: 0, y: 0 };
+  let targetMouse = { x: 0, y: 0 };
+
+  document.addEventListener('mousemove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    targetMouse.x = ((e.clientX - rect.left) / rect.width - 0.5) * 200;
+    targetMouse.y = -((e.clientY - rect.top) / rect.height - 0.5) * 200;
+  });
+
+  document.addEventListener('touchmove', (e) => {
+    const rect = canvas.getBoundingClientRect();
+    const touch = e.touches[0];
+    targetMouse.x = ((touch.clientX - rect.left) / rect.width - 0.5) * 200;
+    targetMouse.y = -((touch.clientY - rect.top) / rect.height - 0.5) * 200;
+  });
+
+  // Animation loop
+  const animate = () => {
+    requestAnimationFrame(animate);
+
+    // Smooth mouse tracking
+    mouse.x += (targetMouse.x - mouse.x) * 0.1;
+    mouse.y += (targetMouse.y - mouse.y) * 0.1;
+
+    // Rotate particles
+    particles.rotation.x += 0.0005;
+    particles.rotation.y += 0.0008;
+
+    // Move particles toward mouse
+    const positionAttribute = particles.geometry.getAttribute('position');
+    const positions = positionAttribute.array;
+
+    for (let i = 0; i < positions.length; i += 3) {
+      const dx = mouse.x - positions[i];
+      const dy = mouse.y - positions[i + 1];
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      if (distance < 100) {
+        const force = (100 - distance) / 100;
+        positions[i] -= (dx * force * 0.05);
+        positions[i + 1] -= (dy * force * 0.05);
+      }
+      
+      // Gentle drift
+      positions[i] += Math.sin(Date.now() * 0.0001 + i) * 0.1;
+      positions[i + 1] += Math.cos(Date.now() * 0.0001 + i) * 0.1;
+    }
+
+    positionAttribute.needsUpdate = true;
+    renderer.render(scene, camera);
+  };
+
+  animate();
+
+  // Handle resize
+  window.addEventListener('resize', () => {
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+    renderer.setSize(width, height);
+  });
 </script>
 </body>
 </html>
