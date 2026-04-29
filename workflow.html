@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Evolvr workflow: evaluate, diagnose, generate, improve, and verify production LLM quality.">
+  <title>Workflow - Evolvr</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="site-nav"><div class="container nav-inner"><a class="logo" href="index.html"><span class="logo-mark"></span>EVOLVR</a><ul class="nav-links"><li><a href="product.html">Product</a></li><li><a class="active" href="workflow.html">Workflow</a></li><li><a href="pricing.html">Pricing</a></li><li><a href="security.html">Security</a></li><li><a href="docs.html">Docs</a></li><li><a href="use-cases.html">Use cases</a></li></ul><div class="nav-actions"><a class="btn btn-primary desktop-cta" href="index.html">Request Access</a><button class="menu-toggle" onclick="toggleMenu()" aria-label="Open menu"><span></span><span></span><span></span></button></div></div><div class="mobile-menu" id="mobileMenu"><a href="product.html">Product</a><a href="workflow.html">Workflow</a><a href="pricing.html">Pricing</a><a href="security.html">Security</a><a href="docs.html">Docs</a><a href="use-cases.html">Use cases</a><a href="index.html">Request Access</a></div></nav>
+  <main>
+    <section class="page-hero"><div class="container"><div class="eyebrow">Workflow</div><h1>From model failure to verified release.</h1><p class="lead">A repeatable loop for AI teams that need measurable quality gains without rebuilding their stack.</p></div></section>
+    <section class="section"><div class="container timeline">
+      <div class="step"><div class="num">01</div><h2>Evaluate</h2><p>Run scenario tests against production tasks and known weak spots.</p><div class="artifact">Artifact: eval baseline</div></div>
+      <div class="step"><div class="num">02</div><h2>Diagnose</h2><p>Cluster failures by task, language, domain, and reasoning pattern.</p><div class="artifact">Artifact: failure map</div></div>
+      <div class="step"><div class="num">03</div><h2>Generate</h2><p>Create targeted data only for gaps that can move quality.</p><div class="artifact">Artifact: dataset</div></div>
+      <div class="step"><div class="num">04</div><h2>Improve</h2><p>Apply the fix through fine-tuning, RAG, prompts, or policy updates.</p><div class="artifact">Artifact: deploy bundle</div></div>
+      <div class="step"><div class="num">05</div><h2>Verify</h2><p>Compare holdout performance before the release goes live.</p><div class="artifact">Artifact: lift report</div></div>
+    </div></section>
+    <section class="section"><div class="container grid-2"><div class="panel"><h2>Designed for weekly releases.</h2><p>Keep the loop close to your product cycle, so evaluation becomes operational instead of ceremonial.</p></div><div class="panel"><h2>Works with your stack.</h2><p>Outputs fit fine-tuning jobs, retrieval updates, prompt systems, and human review workflows.</p></div></div></section>
+  </main>
+  <footer><div class="container footer-bottom">EVOLVR - Continuous improvement loops for production LLM teams.</div></footer>
+  <script src="app.js"></script>
+</body>
+</html>

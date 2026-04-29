@@ -3,855 +3,154 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Evolvr – Your LLM, Continuously Evolving</title>
+  <meta name="description" content="Evolvr turns production LLM failures into verified model improvements with evals, failure maps, synthetic data, and lift reports.">
+  <meta property="og:title" content="Evolvr - Continuous LLM Improvement">
+  <meta property="og:description" content="Find where your LLM fails. Generate targeted data. Validate the lift before release.">
+  <meta property="og:image" content="og-image.svg">
+  <title>Evolvr - Continuous LLM Improvement</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
-    :root {
-      --bg: #0A0A0A;
-      --bg2: #111111;
-      --bg3: #0F0F0F;
-      --border: #1E1E1E;
-      --accent: #7B4FFF;
-      --accent2: #5B3FEF;
-      --text: #FFFFFF;
-      --text-dim: #B0B0B0;
-    }
-
-    body {
-      background: var(--bg);
-      color: var(--text);
-      font-family: 'Inter', sans-serif;
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
-
-    h1, h2, h3, h4 {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-weight: 800;
-      letter-spacing: -0.025em;
-      line-height: 1.15;
-    }
-
-    h1 { font-size: clamp(40px, 6vw, 76px); color: var(--text); }
-    h2 { font-size: clamp(28px, 4vw, 52px); color: var(--text); }
-
-    /* ── BUTTONS ── */
-    .btn {
-      font-family: 'Inter', sans-serif;
-      font-weight: 700;
-      font-size: 14px;
-      padding: 14px 28px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-decoration: none;
-      display: inline-block;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #fff;
-      box-shadow: 0 8px 24px rgba(123,79,255,0.3);
-    }
-    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(123,79,255,0.45); }
-    .btn-outline {
-      background: transparent;
-      color: #fff;
-      border: 1.5px solid rgba(255,255,255,0.25);
-    }
-    .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: rgba(123,79,255,0.05); transform: translateY(-2px); }
-
-    /* ── NAV ── */
-    nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 22px 60px;
-      background: rgba(10,10,10,0.92);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(123,79,255,0.1);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-    .logo {
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 24px;
-      font-weight: 800;
-      letter-spacing: 2px;
-      color: var(--text);
-    }
-    .logo .v { color: var(--accent); }
-    .nav-links { display: flex; gap: 36px; list-style: none; }
-    .nav-links a { color: var(--text); text-decoration: none; font-weight: 600; font-size: 14px; transition: color 0.2s; }
-    .nav-links a:hover { color: var(--accent); }
-
-    /* ── HERO ── */
-    .hero {
-      padding: 130px 60px 100px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .hero::before {
-      content: '';
-      position: absolute; top: -30%; right: -15%;
-      width: 600px; height: 600px;
-      background: radial-gradient(circle, rgba(123,79,255,0.12) 0%, transparent 70%);
-      filter: blur(40px); pointer-events: none;
-    }
-    .hero::after {
-      content: '';
-      position: absolute; bottom: -20%; left: -10%;
-      width: 400px; height: 400px;
-      background: radial-gradient(circle, rgba(91,63,239,0.09) 0%, transparent 70%);
-      filter: blur(40px); pointer-events: none;
-    }
-    .hero-content { position: relative; z-index: 2; }
-    .hero h1 { margin-bottom: 24px; animation: fadeUp 0.7s ease both; }
-    .hero .subtext {
-      font-size: 18px; color: var(--text-dim);
-      max-width: 680px; margin: 0 auto 44px;
-      line-height: 1.75; animation: fadeUp 0.7s 0.1s ease both;
-    }
-    .hero-ctas { display: flex; gap: 14px; justify-content: center; margin-bottom: 40px; animation: fadeUp 0.7s 0.2s ease both; flex-wrap: wrap; }
-    .social-proof { font-size: 13px; color: var(--text-dim); margin-bottom: 72px; animation: fadeUp 0.7s 0.3s ease both; }
-
-    .hero-visual {
-      background: var(--bg2);
-      border: 1px solid rgba(123,79,255,0.2);
-      border-radius: 8px;
-      padding: 48px;
-      max-width: 860px;
-      margin: 0 auto;
-      box-shadow: 0 20px 60px rgba(123,79,255,0.08);
-      animation: fadeUp 0.7s 0.4s ease both;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-    .hero-visual:hover { border-color: rgba(123,79,255,0.4); box-shadow: 0 30px 80px rgba(123,79,255,0.14); }
-
-    .ba-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 32px; align-items: center; }
-    .metric-card { background: var(--bg3); padding: 24px; border-radius: 6px; border: 1px solid var(--border); text-align: left; }
-    .metric-label { font-size: 11px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 8px; }
-    .metric-value { font-size: 36px; font-weight: 800; color: var(--accent); margin-bottom: 4px; }
-    .metric-desc { font-size: 13px; color: var(--text-dim); }
-    .ba-arrow { color: var(--accent); font-size: 22px; font-weight: 800; }
-
-    /* ── LOGOS ── */
-    .logos-bar {
-      padding: 52px 60px;
-      text-align: center;
-      border-top: 1px solid rgba(123,79,255,0.08);
-      border-bottom: 1px solid rgba(123,79,255,0.08);
-    }
-    .logos-title { font-size: 12px; color: var(--text-dim); letter-spacing: 2.5px; text-transform: uppercase; font-weight: 600; margin-bottom: 36px; }
-    .logos-grid { display: flex; justify-content: center; gap: 24px; flex-wrap: wrap; align-items: center; }
-    .logo-item {
-      width: 130px; height: 44px;
-      background: rgba(123,79,255,0.04);
-      border: 1px solid rgba(123,79,255,0.12);
-      border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 12px; color: var(--text-dim); font-weight: 600;
-      transition: all 0.25s;
-    }
-    .logo-item:hover { border-color: rgba(123,79,255,0.3); color: var(--text); }
-
-    /* ── HOW IT WORKS ── */
-    .how {
-      padding: 110px 60px;
-      text-align: center;
-    }
-    .how h2 { margin-bottom: 72px; }
-    .steps {
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      max-width: 1100px;
-      margin: 0 auto;
-      gap: 12px;
-    }
-    .steps::before {
-      content: '';
-      position: absolute; top: 39px; left: 8%; right: 8%;
-      height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(123,79,255,0.4), transparent);
-    }
-    .step { flex: 1; position: relative; z-index: 1; text-align: center; transition: transform 0.25s; }
-    .step:hover { transform: translateY(-4px); }
-    .step-icon {
-      width: 78px; height: 78px;
-      background: rgba(123,79,255,0.1);
-      border: 2px solid rgba(123,79,255,0.35);
-      border-radius: 50%;
-      margin: 0 auto 20px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 28px; font-weight: 800; color: var(--accent);
-      transition: all 0.25s;
-    }
-    .step:hover .step-icon { border-color: var(--accent); box-shadow: 0 0 18px rgba(123,79,255,0.2); }
-    .step h3 { font-size: 15px; font-weight: 700; margin-bottom: 10px; }
-    .step p { font-size: 13px; color: var(--text-dim); line-height: 1.6; padding: 0 8px; }
-
-    /* ── FEATURES ── */
-    .features { padding: 110px 60px; }
-    .features h2 { text-align: center; margin-bottom: 72px; }
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 28px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    .feature-card {
-      background: var(--bg2);
-      border: 1px solid rgba(123,79,255,0.12);
-      border-radius: 8px;
-      padding: 40px;
-      position: relative;
-      overflow: hidden;
-      transition: all 0.3s ease;
-    }
-    .feature-card::before {
-      content: '';
-      position: absolute; top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(123,79,255,0.5), transparent);
-    }
-    .feature-card:hover { border-color: rgba(123,79,255,0.35); transform: translateY(-6px); box-shadow: 0 20px 50px rgba(123,79,255,0.12); }
-    .feature-icon { font-size: 28px; margin-bottom: 18px; }
-    .feature-card h3 { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
-    .feature-card p { font-size: 14px; color: var(--text-dim); line-height: 1.75; }
-
-    /* ── METRICS ── */
-    .metrics {
-      padding: 100px 60px;
-      background: var(--bg2);
-      border-top: 1px solid rgba(123,79,255,0.08);
-      border-bottom: 1px solid rgba(123,79,255,0.08);
-    }
-    .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0; max-width: 900px; margin: 0 auto; text-align: center; }
-    .metric-stat { padding: 20px; border-left: 1px solid rgba(123,79,255,0.15); }
-    .metric-stat:first-child { border-left: none; }
-    .metric-stat .num { font-size: 52px; font-weight: 800; color: var(--accent); margin-bottom: 10px; font-family: 'Plus Jakarta Sans', sans-serif; }
-    .metric-stat .label { font-size: 15px; color: var(--text-dim); }
-
-    /* ── PRICING ── */
-    .pricing { padding: 110px 60px; }
-    .pricing h2 { text-align: center; margin-bottom: 72px; }
-    .pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; max-width: 960px; margin: 0 auto; }
-    .pricing-card {
-      background: var(--bg2);
-      border: 1px solid rgba(123,79,255,0.12);
-      border-radius: 8px;
-      padding: 40px;
-      text-align: center;
-      transition: all 0.3s ease;
-      position: relative;
-    }
-    .pricing-card.highlighted {
-      border-color: rgba(123,79,255,0.5);
-      box-shadow: 0 0 40px rgba(123,79,255,0.15);
-    }
-    .highlighted-badge {
-      position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
-      background: linear-gradient(135deg, var(--accent), var(--accent2));
-      color: #fff; font-size: 11px; font-weight: 700;
-      padding: 4px 14px; border-radius: 20px; letter-spacing: 0.5px;
-      white-space: nowrap;
-    }
-    .pricing-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 20px; }
-    .price-tag { font-size: 20px; font-weight: 700; color: var(--text-dim); margin-bottom: 6px; }
-    .price-period { font-size: 13px; color: var(--text-dim); margin-bottom: 28px; }
-    .pricing-features { list-style: none; margin-bottom: 28px; text-align: left; }
-    .pricing-features li { font-size: 13px; padding: 10px 0; border-bottom: 1px solid var(--border); color: var(--text-dim); }
-    .pricing-features li:last-child { border-bottom: none; }
-
-    /* ── CTA BANNER ── */
-    .cta-banner {
-      padding: 96px 60px;
-      background: linear-gradient(135deg, rgba(123,79,255,0.09), rgba(91,63,239,0.04));
-      border-top: 1px solid rgba(123,79,255,0.18);
-      border-bottom: 1px solid rgba(123,79,255,0.18);
-      text-align: center;
-    }
-    .cta-banner h2 { margin-bottom: 36px; }
-
-    /* ── FOOTER ── */
-    footer { padding: 60px; background: var(--bg); border-top: 1px solid var(--border); }
-    .footer-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 60px; margin-bottom: 48px; }
-    .footer-brand .logo { font-size: 20px; display: block; margin-bottom: 8px; }
-    .footer-brand p { font-size: 14px; color: var(--text-dim); }
-    .footer-col h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 16px; color: var(--text); }
-    .footer-col ul { list-style: none; }
-    .footer-col ul li { margin-bottom: 10px; }
-    .footer-col ul a { color: var(--text-dim); text-decoration: none; font-size: 14px; transition: color 0.2s; }
-    .footer-col ul a:hover { color: var(--accent); }
-    .footer-bottom { border-top: 1px solid var(--border); padding-top: 32px; text-align: center; font-size: 13px; color: var(--text-dim); max-width: 1100px; margin: 0 auto; }
-
-    /* ── WAITLIST MODAL ── */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.72); backdrop-filter: blur(6px);
-      z-index: 9999; align-items: center; justify-content: center;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal-box {
-      background: var(--bg2);
-      border: 1px solid rgba(123,79,255,0.3);
-      border-radius: 12px;
-      padding: 56px;
-      max-width: 460px; width: 90%;
-      text-align: center;
-      position: relative;
-      animation: popUp 0.35s cubic-bezier(0.34,1.56,0.64,1) both;
-    }
-    @keyframes popUp { from { opacity:0; transform:translateY(32px); } to { opacity:1; transform:translateY(0); } }
-    .modal-close {
-      position: absolute; top: 18px; right: 18px;
-      background: none; border: none; color: var(--text-dim);
-      font-size: 22px; cursor: pointer; transition: color 0.2s;
-      width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-    }
-    .modal-close:hover { color: var(--accent); }
-    .modal-box h2 { font-size: 28px; margin-bottom: 12px; }
-    .modal-box .modal-sub { font-size: 15px; color: var(--text-dim); margin-bottom: 28px; line-height: 1.6; }
-    .modal-form { display: flex; flex-direction: column; gap: 14px; }
-    .modal-form input {
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(123,79,255,0.25);
-      border-radius: 6px; padding: 13px 16px;
-      color: #fff; font-size: 14px; font-family: 'Inter', sans-serif;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .modal-form input::placeholder { color: rgba(255,255,255,0.35); }
-    .modal-form input:focus { outline: none; border-color: rgba(123,79,255,0.6); background: rgba(255,255,255,0.07); }
-    .modal-form .btn { width: 100%; font-size: 15px; padding: 15px; }
-    .modal-note { margin-top: 16px; font-size: 12px; color: rgba(255,255,255,0.3); }
-
-    /* Success state */
-    .success-state { display: none; }
-    .success-state .check { font-size: 48px; margin-bottom: 16px; }
-    .success-state h3 { font-size: 22px; margin-bottom: 8px; }
-    .success-state p { font-size: 14px; color: var(--text-dim); }
-
-    /* Error msg */
-    .error-msg { font-size: 13px; color: #FF6B6B; margin-top: -6px; display: none; }
-
-    @keyframes fadeUp { from { opacity:0; transform:translateY(24px); } to { opacity:1; transform:translateY(0); } }
-
-    /* ── RESPONSIVE ── */
-    @media (max-width: 900px) {
-      nav { padding: 18px 28px; }
-      .nav-links { display: none; }
-      .hero { padding: 80px 28px 60px; }
-      .how, .features, .pricing, .metrics, .cta-banner, .logos-bar, footer { padding-left: 28px; padding-right: 28px; }
-      .steps { flex-wrap: wrap; gap: 32px; }
-      .steps::before { display: none; }
-      .step { flex: 0 1 calc(50% - 16px); }
-      .pricing-grid, .metrics-grid { grid-template-columns: 1fr; }
-      .footer-inner { grid-template-columns: 1fr; gap: 40px; }
-      .ba-grid { grid-template-columns: 1fr; }
-      .ba-arrow { transform: rotate(90deg); text-align: center; }
-    }
-    @media (max-width: 540px) {
-      .step { flex: 1 1 100%; }
-      .features-grid { grid-template-columns: 1fr; }
-      .hero-visual { padding: 24px; }
-      .modal-box { padding: 36px 24px; }
-    }
-  </style>
-  <script type="importmap">
-  {
-      "imports": {
-          "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
-      }
-  }
-  </script>
 </head>
 <body>
-
-<!-- NAV -->
-<nav>
-  <div class="logo">EVO<span class="v">LV</span>R</div>
-  <ul class="nav-links">
-    <li><a href="#product">Product</a></li>
-    <li><a href="#pricing">Pricing</a></li>
-    <li><a href="#docs">Docs</a></li>
-    <li><a href="#blog">Blog</a></li>
-  </ul>
-  <button class="btn btn-primary" onclick="openModal()">Join Waitlist</button>
-</nav>
-
-<!-- HERO -->
-<section class="hero">
-  <canvas id="hero-canvas" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: auto;"></canvas>
-  <div class="hero-content" style="position: relative; z-index: 2;">
-    <h1>The ONE Thing Your LLM<br>Doesn't Know (Yet).</h1>
-    <p class="subtext">While you sleep, competitors are improving theirs. 43% of AI teams waste $500K+ annually on models that silently fail. Evolvr reveals the blindspots nobody tells you about—then fixes them automatically in 2 hours.</p>
-    <div class="hero-ctas">
-      <button class="btn btn-primary" onclick="openModal()">🔓 Unlock Early Access (50% OFF)</button>
-      <a class="btn btn-outline" href="#how">See the Loop →</a>
-    </div>
-    <p class="social-proof">⭐ 347 founders on waitlist | Only 50 spots left for Q2 launch | 📍 Backed by Y Combinator network</p>
-    <div class="hero-visual">
-      <div class="ba-grid">
-        <div class="metric-card">
-          <div class="metric-label">Criminal Law Accuracy</div>
-          <div class="metric-value">43%</div>
-          <div class="metric-desc">Before Evolvr</div>
-        </div>
-        <div class="ba-arrow">→</div>
-        <div class="metric-card">
-          <div class="metric-label">Criminal Law Accuracy</div>
-          <div class="metric-value" style="color:#00D084;">89%</div>
-          <div class="metric-desc">After Evolvr ↑ +107%</div>
-        </div>
+  <nav class="site-nav">
+    <div class="container nav-inner">
+      <a class="logo" href="index.html"><span class="logo-mark"></span>EVOLVR</a>
+      <ul class="nav-links">
+        <li><a href="product.html">Product</a></li>
+        <li><a href="workflow.html">Workflow</a></li>
+        <li><a href="pricing.html">Pricing</a></li>
+        <li><a href="security.html">Security</a></li>
+        <li><a href="docs.html">Docs</a></li>
+        <li><a href="use-cases.html">Use cases</a></li>
+      </ul>
+      <div class="nav-actions">
+        <button class="btn btn-primary desktop-cta" onclick="openModal()">Request Access</button>
+        <button class="menu-toggle" onclick="toggleMenu()" aria-label="Open menu"><span></span><span></span><span></span></button>
       </div>
     </div>
-  </div>
-</section>
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="product.html">Product</a>
+      <a href="workflow.html">Workflow</a>
+      <a href="pricing.html">Pricing</a>
+      <a href="security.html">Security</a>
+      <a href="docs.html">Docs</a>
+      <a href="use-cases.html">Use cases</a>
+      <button onclick="openModal()">Request Access</button>
+    </div>
+  </nav>
 
-<!-- LOGOS -->
-<section class="logos-bar">
-  <p class="logos-title">Trusted by teams at —</p>
-  <div class="logos-grid">
-    <div class="logo-item">OpenAI</div>
-    <div class="logo-item">Anthropic</div>
-    <div class="logo-item">Scale AI</div>
-    <div class="logo-item">Databricks</div>
-    <div class="logo-item">Together AI</div>
-    <div class="logo-item">Hugging Face</div>
-  </div>
-</section>
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div>
+          <div class="eyebrow">Continuous model improvement</div>
+          <h1>Turn LLM failures into shippable fixes.</h1>
+          <p class="lead">Evolvr finds weak spots, generates targeted data, and validates the lift before your next release.</p>
+          <div class="hero-actions">
+            <button class="btn btn-primary" onclick="openModal()">Request Early Access</button>
+            <a class="btn" href="workflow.html">View Workflow</a>
+          </div>
+          <div class="hero-note">
+            <span>Private beta</span>
+            <span>Failure maps</span>
+            <span>Deployable datasets</span>
+          </div>
+        </div>
 
-<!-- HOW IT WORKS -->
-<section class="how" id="how">
-  <h2>The Cycle Your Competitors Can't Stop (Yet)</h2>
-  <div class="steps">
-    <div class="step">
-      <div class="step-icon">①</div>
-      <h3>REVEAL</h3>
-      <p>Uncover the exact moment & reason your model fails. 10,000+ test scenarios. Zero false comfort.</p>
-    </div>
-    <div class="step">
-      <div class="step-icon">②</div>
-      <h3>EXPOSE</h3>
-      <p>Watch competitors' models improve while yours stays flat? Not on our watch. We show you why.</p>
-    </div>
-    <div class="step">
-      <div class="step-icon">③</div>
-      <h3>FIX</h3>
-      <p>Generate surgical fine-tuning data. No noise. No BS. Just results.</p>
-    </div>
-    <div class="step">
-      <div class="step-icon">④</div>
-      <h3>DEPLOY</h3>
-      <p>2 hours from diagnosis to production. No DevOps theater. No waiting for your team.</p>
-    </div>
-    <div class="step">
-      <div class="step-icon">⑤</div>
-      <h3>VERIFY & REPEAT</h3>
-      <p>See the delta. Share it. Then do it again next sprint. The flywheel spins.</p>
-    </div>
-  </div>
-</section>
-
-<!-- FEATURES -->
-<section class="features" id="product">
-  <h2>What Your Competitors Pray You Never Find Out</h2>
-  <div class="features-grid">
-    <div class="feature-card">
-      <div class="feature-icon">�</div>
-      <h3>Failure Heatmap</h3>
-      <p>Stop guessing where your model breaks. We map it. Visual proof of every weak spot. Your board won't argue with data.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">⚡</div>
-      <h3>Synthetic Data That Works</h3>
-      <p>Not just more training data. Smart data. Anti-hallucination filtered. The kind that makes your accuracy jump 40%+.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🚀</div>
-      <h3>Deploy Without Sweating</h3>
-      <p>2-hour turnaround. Seriously. No GPU hunting. No DevOps nightmares. Your non-technical founder can hit deploy.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">📊</div>
-      <h3>Proof That Sticks</h3>
-      <p>Before/after metrics you can show investors, your board, your CEO. The kind that gets you funded.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">🌏</div>
-      <h3>Indic Language Domination</h3>
-      <p>Hindi, Hinglish, Tamil. Nobody else does this well. You will. Global advantage locked.</p>
-    </div>
-    <div class="feature-card">
-      <div class="feature-icon">♻️</div>
-      <h3>The Continuous Advantage</h3>
-      <p>Deploy. Monitor. Improve. Repeat. Your model gets smarter monthly. Theirs stays frozen. Game over.</p>
-  </div>
-</section>
-
-<!-- METRICS -->
-<section class="metrics">
-  <div class="metrics-grid">
-    <div class="metric-stat">
-      <div class="num">+107%</div>
-      <div class="label">average accuracy jump (first loop)</div>
-    </div>
-    <div class="metric-stat">
-      <div class="num">2h</div>
-      <div class="label">from diagnosis to production</div>
-    </div>
-    <div class="metric-stat">
-      <div class="num">$500K+</div>
-      <div class="label">saved annually per team</div>
-    </div>
-  </div>
-</section>
-
-<!-- TESTIMONIALS -->
-<section style="padding: 110px 60px; background: var(--bg2); border-top: 1px solid rgba(123,79,255,0.08);">
-  <div style="text-align: center; margin-bottom: 72px;">
-    <h2>Teams That Started Using Evolvr</h2>
-  </div>
-  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 28px; max-width: 1100px; margin: 0 auto;">
-    <div style="background: var(--bg); border: 1px solid rgba(123,79,255,0.12); border-radius: 8px; padding: 32px;">
-      <p style="color: var(--text-dim); font-style: italic; margin-bottom: 16px;">"We went from 43% to 89% accuracy in one sprint. Our investors finally stopped asking dumb questions."</p>
-      <p style="color: var(--accent); font-weight: 700; font-size: 14px;">Arjun K. — Founder, LegalAI Co</p>
-      <p style="color: var(--text-dim); font-size: 13px;">Reduced model debugging by 80%</p>
-    </div>
-    <div style="background: var(--bg); border: 1px solid rgba(123,79,255,0.12); border-radius: 8px; padding: 32px;">
-      <p style="color: var(--text-dim); font-style: italic; margin-bottom: 16px;">"No more guessing. We KNOW exactly why our model fails now. This is a $2M problem solver."</p>
-      <p style="color: var(--accent); font-weight: 700; font-size: 14px;">Priya M. — ML Lead, FinTech Unicorn</p>
-      <p style="color: var(--text-dim); font-size: 13px;">Deployed 3 improved models this quarter</p>
-    </div>
-    <div style="background: var(--bg); border: 1px solid rgba(123,79,255,0.12); border-radius: 8px; padding: 32px;">
-      <p style="color: var(--text-dim); font-style: italic; margin-bottom: 16px;">"Evolvr does what our entire 15-person data team couldn't do. Game changer for us."</p>
-      <p style="color: var(--accent); font-weight: 700; font-size: 14px;">Rohit S. — VP Engineering, Healthcare AI</p>
-      <p style="color: var(--text-dim); font-size: 13px;">Freed up 400+ hours from manual labeling</p>
-    </div>
-  </div>
-</section>
-<section class="pricing" id="pricing">
-  <h2>Invest in Certainty ⚡ Not Hope</h2>
-  <p style="text-align: center; color: var(--text-dim); margin-bottom: 48px; font-size: 16px;">Only 50 spots reserved for Q2 launch. Pick your power level.</p>
-  <div class="pricing-grid">
-    <div class="pricing-card">
-      <h3>Experiement</h3>
-      <div class="price-tag" style="color: var(--text-dim);">Free</div>
-      <div class="price-period">Forever</div>
-      <ul class="pricing-features">
-        <li>✓ 5 evals / month</li>
-        <li>✓ See if it works</li>
-        <li>✓ Community Slack</li>
-        <li>✗ Synthetic data</li>
-        <li>✗ Auto deployment</li>
-      </ul>
-      <button class="btn btn-outline" style="width:100%" onclick="openModal()">Just Test It</button>
-    </div>
-    <div class="pricing-card highlighted">
-      <div class="highlighted-badge">💉 The Winner</div>
-      <h3>Startup Bundle</h3>
-      <div class="price-tag" style="color: var(--text-dim);">$499/mo</div>
-      <div class="price-period">50% OFF for life (Q2 launch)</div>
-      <ul class="pricing-features">
-        <li>✓ Unlimited evals</li>
-        <li>✓ Auto synthetic data</li>
-        <li>✓ 2-hour deploys</li>
-        <li>✓ Proof metrics</li>
-        <li>✓ Priority support</li>
-      </ul>
-      <button class="btn btn-primary" style="width:100%" onclick="openModal()">Secure Your Spot (Limited)</button>
-    </div>
-    <div class="pricing-card">
-      <h3>Enterprise</h3>
-      <div class="price-tag" style="color: var(--text-dim);">Custom</div>
-      <div class="price-period">Everything, customized</div>
-      <ul class="pricing-features">
-        <li>✓ Everything in Startup</li>
-        <li>✓ White-label option</li>
-        <li>✓ Custom integrations</li>
-        <li>✓ Dedicated ML engineer</li>
-        <li>✓ SLA + uptime guarantee</li>
-      </ul>
-      <button class="btn btn-outline" style="width:100%" onclick="openModal()">Let's Talk</button>
-    </div>
-  </div>
-</section>
-
-<!-- CTA BANNER -->
-<section class="cta-banner">
-  <h2>Your Competitors Don't Know You're Here.</h2>
-  <p style="color: var(--text-dim); font-size: 18px; margin-bottom: 32px; max-width: 600px; margin-left: auto; margin-right: auto;">347 founders on the waitlist. Only 50 spots for Q2. The gap between them and you closes every day.</p>
-  <button class="btn btn-primary" onclick="openModal()">🔓 Join The Smart Ones (Limited Slots)</button>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-inner">
-    <div class="footer-brand">
-      <span class="logo">EVO<span class="v">LV</span>R</span>
-      <p style="margin-top: 8px;">🧠 The AI model improvement engine that your competitors hope you never use.</p>
-      <p style="font-size: 12px; color: var(--text-dim); margin-top: 12px;">Backed by YC network | Trusted by 347+ teams</p>
-    </div>
-    <div class="footer-col">
-      <h4>Product</h4>
-      <ul>
-        <li><a href="#product">Features</a></li>
-        <li><a href="#pricing">Pricing</a></li>
-        <li><a href="#docs">Documentation</a></li>
-        <li><a href="#status">Status</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h4>Company</h4>
-      <ul>
-        <li><a href="#about">About</a></li>
-        <li><a href="#blog">Blog</a></li>
-        <li><a href="#careers">Careers</a></li>
-        <li><a href="#legal">Legal</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>© 2026 Evolvr Inc. All rights reserved.</p>
-  </div>
-</footer>
-
-<!-- WAITLIST MODAL -->
-<div class="modal-overlay" id="modal">
-  <div class="modal-box">
-    <button class="modal-close" onclick="closeModal()">✕</button>
-
-    <!-- Form state -->
-    <div id="formState">
-      <h2>🔓 Secure Your Spot</h2>
-      <p class="modal-sub">🚨 347 ahead of you. Only 50 spots left for Q2 launch. 50% OFF the Startup plan for life if you join now.</p>
-      <div class="modal-form">
-        <input type="email" id="emailInput" placeholder="your@email.com" required>
-        <input type="text" id="companyInput" placeholder="Company name">
-        <p class="error-msg" id="errorMsg">Something went wrong. Please try again.</p>
-        <button class="btn btn-primary" id="submitBtn" onclick="submitWaitlist()">Join Early Access (50% OFF)</button>
+        <div class="dashboard" aria-label="Evolvr dashboard preview">
+          <div class="dashboard-top"><span>Eval run: legal-rag-v3</span><span class="status-dot"></span></div>
+          <div class="dashboard-body">
+            <div class="score-row">
+              <div class="score-card"><div class="score-label">Baseline</div><div class="score-value">43%</div><div class="score-desc">Criminal law accuracy</div></div>
+              <div class="arrow">-></div>
+              <div class="score-card"><div class="score-label">After loop</div><div class="score-value after">89%</div><div class="score-desc">Validated on holdout set</div></div>
+            </div>
+            <div class="trace">
+              <div><strong>cluster</strong>: jurisdiction ambiguity</div>
+              <div><strong>generated</strong>: 12,480 targeted examples</div>
+              <div><strong>checks</strong>: leakage + hallucination filters passed</div>
+              <div><strong>ready</strong>: dataset + eval report</div>
+            </div>
+          </div>
+        </div>
       </div>
-      <p class="modal-note">✅ Instant confirmation | 🔚 No spam ever | 📄 You'll get details within 48 hours</p>
-    </div>
+    </section>
 
-    <!-- Success state -->
-    <div class="success-state" id="successState">
-      <div class="check">🫡</div>
-      <h3>You're In The Club!</h3>
-      <p>Position #[#POSITION#] on the waitlist. You'll be first to know when Q2 goes live. Check your email for details.</p>
-      <p style="font-size: 13px; color: var(--accent); margin-top: 16px; font-weight: 600;">50% OFF locked in for life 🔓</p>
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div><div class="eyebrow">Built for technical teams</div><h2>Built for serious AI teams.</h2></div>
+          <p>For regulated workflows, enterprise copilots, support automation, and domain agents.</p>
+        </div>
+        <div class="logos">
+          <div class="logo-cell">LLM Apps</div><div class="logo-cell">AI Agents</div><div class="logo-cell">RAG Systems</div><div class="logo-cell">Fintech</div><div class="logo-cell">Legal AI</div><div class="logo-cell">Healthcare AI</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <div><div class="eyebrow">Product</div><h2>Everything needed to improve model quality.</h2></div>
+          <p>Clear enough for leadership. Detailed enough for ML teams.</p>
+        </div>
+        <div class="grid-3">
+          <div class="card"><div class="kicker">Visibility</div><h3>Failure heatmaps</h3><p>Know exactly where quality drops.</p></div>
+          <div class="card"><div class="kicker">Data</div><h3>Targeted synthetic data</h3><p>Add focused examples, not noisy volume.</p></div>
+          <div class="card"><div class="kicker">Validation</div><h3>Before and after reports</h3><p>Show the lift with one source of truth.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container metrics-band">
+        <div class="metric"><strong>+107%</strong><span>lift in a first-loop legal benchmark</span></div>
+        <div class="metric"><strong>2h</strong><span>from diagnosis to deployable artifact</span></div>
+        <div class="metric"><strong>10k+</strong><span>scenario tests per domain run</span></div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="container cta-inner">
+        <div><div class="eyebrow">Private beta</div><h2>Bring one hard model failure.</h2><p>We will show the eval, the data path, and the measurable lift.</p></div>
+        <button class="btn btn-primary" onclick="openModal()">Request Early Access</button>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div><a class="logo" href="index.html"><span class="logo-mark"></span>EVOLVR</a><p>Continuous improvement loops for production LLM teams.</p></div>
+      <div class="footer-col"><h4>Product</h4><ul><li><a href="product.html">Features</a></li><li><a href="workflow.html">Workflow</a></li><li><a href="pricing.html">Pricing</a></li><li><a href="docs.html">Docs</a></li></ul></div>
+      <div class="footer-col"><h4>Company</h4><ul><li><a href="security.html">Security</a></li><li><a href="use-cases.html">Use cases</a></li><li><a href="pricing.html">Contact</a></li></ul></div>
+    </div>
+    <div class="container footer-bottom">&copy; 2026 Evolvr Inc. All rights reserved.</div>
+  </footer>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal()" aria-label="Close modal">x</button>
+      <div id="formState">
+        <h2>Request early access</h2>
+        <p class="modal-sub">Tell us what you are shipping. We will follow up with beta access details.</p>
+        <div class="modal-form">
+          <input type="email" id="emailInput" placeholder="Work email" required>
+          <input type="text" id="companyInput" placeholder="Company name">
+          <select id="useCaseInput"><option value="">Primary use case</option><option>RAG system</option><option>AI agent</option><option>Support automation</option><option>Legal / fintech / healthcare AI</option><option>Indic or multilingual model</option></select>
+          <textarea id="failureInput" placeholder="Biggest model failure you want to fix"></textarea>
+          <p class="error-msg" id="errorMsg">Something went wrong. Please try again.</p>
+          <button class="btn btn-primary" id="submitBtn" onclick="submitWaitlist()">Submit Request</button>
+        </div>
+        <p class="modal-note">No spam. We will only use this to follow up about Evolvr access.</p>
+      </div>
+      <div class="success-state" id="successState"><h2>Request received</h2><p>Thanks. Your request has been saved, and we will follow up with onboarding details.</p></div>
     </div>
   </div>
-</div>
 
-<script>
-  // ── Supabase Init ──
-  const { createClient } = supabase;
-  const sb = createClient(
-    'https://pgotfsopsozhxhtflgon.supabase.co',
-    'sb_publishable_YKyyQR-q1b5r-yiARHMK9Q_8sECFY1C'
-  );
-
-  // ── Dynamic Waitlist Counter ──
-  let waitlistCount = 347;
-  let spotsLeft = 50;
-  
-  // Simulate new signups every 30 seconds
-  setInterval(() => {
-    waitlistCount += Math.floor(Math.random() * 3) + 1;
-    spotsLeft = Math.max(0, 50 - Math.floor(waitlistCount / 7));
-    
-    const socialProofEl = document.querySelector('.social-proof');
-    if (socialProofEl) {
-      socialProofEl.innerHTML = `⭐ ${waitlistCount} founders on waitlist | Only ${spotsLeft} spots left for Q2 launch | 📋 Backed by Y Combinator network`;
-    }
-  }, 30000);
-
-  // ── Modal ──
-  function openModal() {
-    document.getElementById('modal').classList.add('open');
-    document.body.style.overflow = 'hidden';
-  }
-  function closeModal() {
-    document.getElementById('modal').classList.remove('open');
-    document.body.style.overflow = '';
-    // reset form after close
-    setTimeout(() => {
-      document.getElementById('formState').style.display = 'block';
-      document.getElementById('successState').style.display = 'none';
-      document.getElementById('emailInput').value = '';
-      document.getElementById('companyInput').value = '';
-      document.getElementById('errorMsg').style.display = 'none';
-      document.getElementById('submitBtn').textContent = 'Get Early Access';
-      document.getElementById('submitBtn').disabled = false;
-    }, 400);
-  }
-
-  // Close on overlay click
-  document.getElementById('modal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-  });
-
-  // Close on ESC
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
-
-  // ── Submit ──
-  async function submitWaitlist() {
-    const email = document.getElementById('emailInput').value.trim();
-    const company = document.getElementById('companyInput').value.trim();
-    const btn = document.getElementById('submitBtn');
-    const errMsg = document.getElementById('errorMsg');
-
-    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errMsg.textContent = 'Please enter a valid email address.';
-      errMsg.style.display = 'block';
-      return;
-    }
-
-    btn.textContent = 'Saving...';
-    btn.disabled = true;
-    errMsg.style.display = 'none';
-
-    const { error } = await sb
-      .from('waitlist')
-      .insert([{ email, company: company || null }]);
-
-    if (error) {
-      if (error.code === '23505') {
-        // duplicate — still show success
-        showSuccess();
-      } else {
-        errMsg.textContent = 'Something went wrong. Please try again.';
-        errMsg.style.display = 'block';
-        btn.textContent = 'Get Early Access';
-        btn.disabled = false;
-      }
-    } else {
-      showSuccess();
-    }
-  }
-
-  function showSuccess() {
-    const userPosition = waitlistCount + Math.floor(Math.random() * 5) + 1;
-    document.getElementById('formState').style.display = 'none';
-    document.getElementById('successState').style.display = 'block';
-    document.querySelector('#successState h3').textContent = 'You\'re In The Club!';
-    document.querySelector('#successState p:nth-of-type(1)').textContent = `Position #${userPosition} on the waitlist. You'll be first to know when Q2 goes live. Check your email for details.`;
-  }
-</script>
-
-<!-- HERO PARTICLE ANIMATION -->
-<script type="module">
-  import * as THREE from 'three';
-
-  const canvas = document.getElementById('hero-canvas');
-  const heroSection = document.querySelector('.hero');
-  const scene = new THREE.Scene();
-  
-  const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
-  camera.position.z = 100;
-  
-  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-  renderer.setClearColor(0x000000, 0);
-  renderer.setSize(canvas.clientWidth, canvas.clientHeight);
-  renderer.setPixelRatio(window.devicePixelRatio);
-
-  // Particle system
-  const particlesGeometry = new THREE.BufferGeometry();
-  const particleCount = 1500;
-  const positionArray = new Float32Array(particleCount * 3);
-  
-  for (let i = 0; i < particleCount * 3; i += 3) {
-    positionArray[i] = (Math.random() - 0.5) * 400;
-    positionArray[i + 1] = (Math.random() - 0.5) * 400;
-    positionArray[i + 2] = (Math.random() - 0.5) * 300;
-  }
-  
-  particlesGeometry.setAttribute('position', new THREE.BufferAttribute(positionArray, 3));
-  
-  const particlesMaterial = new THREE.PointsMaterial({
-    size: 2,
-    color: 0x7B4FFF,
-    sizeAttenuation: true,
-    transparent: true,
-    opacity: 0.6
-  });
-  
-  const particles = new THREE.Points(particlesGeometry, particlesMaterial);
-  scene.add(particles);
-
-  // Mouse tracking
-  let mouse = { x: 0, y: 0 };
-  let targetMouse = { x: 0, y: 0 };
-
-  document.addEventListener('mousemove', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    targetMouse.x = ((e.clientX - rect.left) / rect.width - 0.5) * 200;
-    targetMouse.y = -((e.clientY - rect.top) / rect.height - 0.5) * 200;
-  });
-
-  document.addEventListener('touchmove', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    const touch = e.touches[0];
-    targetMouse.x = ((touch.clientX - rect.left) / rect.width - 0.5) * 200;
-    targetMouse.y = -((touch.clientY - rect.top) / rect.height - 0.5) * 200;
-  });
-
-  // Animation loop
-  const animate = () => {
-    requestAnimationFrame(animate);
-
-    // Smooth mouse tracking
-    mouse.x += (targetMouse.x - mouse.x) * 0.1;
-    mouse.y += (targetMouse.y - mouse.y) * 0.1;
-
-    // Rotate particles
-    particles.rotation.x += 0.0005;
-    particles.rotation.y += 0.0008;
-
-    // Move particles toward mouse
-    const positionAttribute = particles.geometry.getAttribute('position');
-    const positions = positionAttribute.array;
-
-    for (let i = 0; i < positions.length; i += 3) {
-      const dx = mouse.x - positions[i];
-      const dy = mouse.y - positions[i + 1];
-      const distance = Math.sqrt(dx * dx + dy * dy);
-      
-      if (distance < 100) {
-        const force = (100 - distance) / 100;
-        positions[i] -= (dx * force * 0.05);
-        positions[i + 1] -= (dy * force * 0.05);
-      }
-      
-      // Gentle drift
-      positions[i] += Math.sin(Date.now() * 0.0001 + i) * 0.1;
-      positions[i + 1] += Math.cos(Date.now() * 0.0001 + i) * 0.1;
-    }
-
-    positionAttribute.needsUpdate = true;
-    renderer.render(scene, camera);
-  };
-
-  animate();
-
-  // Handle resize
-  window.addEventListener('resize', () => {
-    const width = canvas.clientWidth;
-    const height = canvas.clientHeight;
-    camera.aspect = width / height;
-    camera.updateProjectionMatrix();
-    renderer.setSize(width, height);
-  });
-</script>
+  <script src="app.js"></script>
 </body>
 </html>

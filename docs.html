@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Technical overview of how Evolvr integrates with LLM products: upload evals, run tests, generate data, export artifacts, and verify lift.">
+  <title>Docs - Evolvr</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="site-nav"><div class="container nav-inner"><a class="logo" href="index.html"><span class="logo-mark"></span>EVOLVR</a><ul class="nav-links"><li><a href="product.html">Product</a></li><li><a href="workflow.html">Workflow</a></li><li><a href="pricing.html">Pricing</a></li><li><a href="security.html">Security</a></li><li><a class="active" href="docs.html">Docs</a></li><li><a href="use-cases.html">Use cases</a></li></ul><div class="nav-actions"><a class="btn btn-primary desktop-cta" href="index.html">Request Access</a><button class="menu-toggle" onclick="toggleMenu()" aria-label="Open menu"><span></span><span></span><span></span></button></div></div><div class="mobile-menu" id="mobileMenu"><a href="product.html">Product</a><a href="workflow.html">Workflow</a><a href="pricing.html">Pricing</a><a href="security.html">Security</a><a href="docs.html">Docs</a><a href="use-cases.html">Use cases</a><a href="index.html">Request Access</a></div></nav>
+  <main>
+    <section class="page-hero"><div class="container"><div class="eyebrow">Technical overview</div><h1>Integrate Evolvr without changing your model stack.</h1><p class="lead">Connect model outputs, eval sets, or failure logs. Evolvr returns failure maps, datasets, and validation reports.</p></div></section>
+    <section class="section"><div class="container timeline">
+      <div class="step"><div class="num">01</div><h2>Bring inputs</h2><p>Upload eval sets, logs, labeled examples, or model endpoint outputs.</p><div class="artifact">Input: JSONL / CSV / endpoint</div></div>
+      <div class="step"><div class="num">02</div><h2>Run evals</h2><p>Execute domain scenarios against the current model behavior.</p><div class="artifact">Output: baseline score</div></div>
+      <div class="step"><div class="num">03</div><h2>Map gaps</h2><p>Cluster failures into patterns your team can act on.</p><div class="artifact">Output: failure map</div></div>
+      <div class="step"><div class="num">04</div><h2>Export fixes</h2><p>Generate and export focused improvement artifacts.</p><div class="artifact">Output: dataset bundle</div></div>
+      <div class="step"><div class="num">05</div><h2>Verify lift</h2><p>Compare holdout performance before shipping.</p><div class="artifact">Output: release report</div></div>
+    </div></section>
+    <section class="section"><div class="container grid-3"><div class="card"><div class="kicker">Input</div><h3>Flexible data</h3><p>Start from evals, logs, examples, or endpoint traces.</p></div><div class="card"><div class="kicker">Output</div><h3>Portable artifacts</h3><p>Use outputs with fine-tunes, RAG, prompts, or review queues.</p></div><div class="card"><div class="kicker">Review</div><h3>Human-readable reports</h3><p>Give leadership and ML teams the same evidence.</p></div></div></section>
+  </main>
+  <footer><div class="container footer-bottom">EVOLVR - Continuous improvement loops for production LLM teams.</div></footer>
+  <script src="app.js"></script>
+</body>
+</html>

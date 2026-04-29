@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explore Evolvr product capabilities: scenario evals, failure maps, synthetic data, validation reports, and release-ready exports.">
+  <title>Product - Evolvr</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <nav class="site-nav">
+    <div class="container nav-inner">
+      <a class="logo" href="index.html"><span class="logo-mark"></span>EVOLVR</a>
+      <ul class="nav-links"><li><a class="active" href="product.html">Product</a></li><li><a href="workflow.html">Workflow</a></li><li><a href="pricing.html">Pricing</a></li><li><a href="security.html">Security</a></li><li><a href="docs.html">Docs</a></li><li><a href="use-cases.html">Use cases</a></li></ul>
+      <div class="nav-actions"><a class="btn btn-primary desktop-cta" href="index.html">Request Access</a><button class="menu-toggle" onclick="toggleMenu()" aria-label="Open menu"><span></span><span></span><span></span></button></div>
+    </div>
+    <div class="mobile-menu" id="mobileMenu"><a href="product.html">Product</a><a href="workflow.html">Workflow</a><a href="pricing.html">Pricing</a><a href="security.html">Security</a><a href="docs.html">Docs</a><a href="use-cases.html">Use cases</a><a href="index.html">Request Access</a></div>
+  </nav>
+  <main>
+    <section class="page-hero"><div class="container"><div class="eyebrow">Product</div><h1>The improvement layer for production LLMs.</h1><p class="lead">Evolvr connects evaluation, failure diagnosis, targeted synthetic data, and validation into one clean workflow.</p></div></section>
+    <section class="section"><div class="container"><div class="section-head"><h2>Core system</h2><p>Everything is designed around one job: turning model failures into verified quality improvements.</p></div><div class="grid-3">
+      <div class="card"><div class="kicker">Evaluate</div><h3>Scenario evals</h3><p>Run domain-specific tests across tasks, languages, intents, and edge cases.</p></div>
+      <div class="card"><div class="kicker">Diagnose</div><h3>Failure maps</h3><p>Cluster weak spots so teams know which problem to solve first.</p></div>
+      <div class="card"><div class="kicker">Generate</div><h3>Synthetic data</h3><p>Create focused examples for verified gaps instead of adding noisy volume.</p></div>
+      <div class="card"><div class="kicker">Validate</div><h3>Lift reports</h3><p>Compare baseline and improved runs before changes reach users.</p></div>
+      <div class="card"><div class="kicker">Export</div><h3>Stack-ready outputs</h3><p>Use artifacts in fine-tunes, RAG updates, prompts, or review queues.</p></div>
+      <div class="card"><div class="kicker">Monitor</div><h3>Release cadence</h3><p>Make model quality measurable across every release cycle.</p></div>
+    </div></div></section>
+    <section class="section"><div class="container hero-grid"><div><div class="eyebrow">Dashboard</div><h2>One view of quality, gaps, and lift.</h2><p class="lead">Give product, ML, and leadership the same quality record.</p></div><div class="dashboard"><div class="dashboard-top"><span>Failure clusters</span><span class="status-dot"></span></div><div class="dashboard-body"><div class="dash-table"><div class="dash-row"><span>Cluster</span><span>Impact</span><span>Status</span></div><div class="dash-row"><span>Jurisdiction ambiguity</span><span class="warn">High</span><span>Generating</span></div><div class="dash-row"><span>Hindi-English queries</span><span class="warn">Medium</span><span>Queued</span></div><div class="dash-row"><span>Policy citation drift</span><span class="good">Fixed</span><span>Verified</span></div></div></div></div></div></section>
+    <section class="section"><div class="container metrics-band"><div class="metric"><strong>10k+</strong><span>scenario tests available per domain run</span></div><div class="metric"><strong>2h</strong><span>from diagnosis to deployable artifact</span></div><div class="metric"><strong>1</strong><span>shared record for model quality</span></div></div></section>
+  </main>
+  <footer><div class="container footer-inner"><div><a class="logo" href="index.html"><span class="logo-mark"></span>EVOLVR</a><p>Continuous improvement loops for production LLM teams.</p></div><div class="footer-col"><h4>Product</h4><ul><li><a href="workflow.html">Workflow</a></li><li><a href="pricing.html">Pricing</a></li><li><a href="docs.html">Docs</a></li></ul></div><div class="footer-col"><h4>Company</h4><ul><li><a href="security.html">Security</a></li><li><a href="use-cases.html">Use cases</a></li></ul></div></div><div class="container footer-bottom">&copy; 2026 Evolvr Inc. All rights reserved.</div></footer>
+  <script src="app.js"></script>
+</body>
+</html>
